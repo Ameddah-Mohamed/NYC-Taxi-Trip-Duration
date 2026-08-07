@@ -16,3 +16,4 @@ __pycache__/
 
 # Backup notebook
 main-copy.ipynb
+catboost_info/*
