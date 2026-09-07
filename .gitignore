@@ -1,12 +1,36 @@
 # Dataset
 data/
+!data/.gitkeep
+!data/processed/.gitkeep
+!data/predictions/.gitkeep
+
+# Models & Pickles
+models/*.pkl
+models/*.joblib
+!models/.gitkeep
+
+# MLflow Tracking
+mlruns/
+mlruns.db
+mlflow.db
 
 # Virtual environment
 .venv/
+env/
+venv/
 
-# Python cache
+# Python cache & build
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -14,8 +38,6 @@ __pycache__/
 # macOS
 .DS_Store
 
-# Backup notebook
-main-copy.ipynb
-catboost_info/*
-
+# Backup
+catboost_info/
 production-pro
