@@ -16,7 +16,13 @@ from src.config import settings
 
 
 def drop_leakage_and_metadata(df: pd.DataFrame) -> pd.DataFrame:
-    """Drop target leakage (dropoff_datetime) and unneeded metadata columns."""
+    """Drop target leakage and unneeded metadata columns.
+    
+    - dropoff_datetime is direct target leakage (trip_duration = dropoff - pickup).
+    - id is an arbitrary identifier with zero predictive value.
+    - store_and_fwd_flag has >99% identical values (near zero variance).
+    - passenger_count showed negligible correlation with duration during EDA.
+    """
     cols_to_drop = ["dropoff_datetime", "id", "store_and_fwd_flag", "passenger_count"]
     existing_cols = [c for c in cols_to_drop if c in df.columns]
     if existing_cols:
@@ -97,13 +103,13 @@ def preprocess_split(
     if not in_path.exists():
         raise FileNotFoundError(f"Input split file not found: {in_path}")
 
-    print(f"🧹 Preprocessing {split} from {in_path}...")
+    print(f"Preprocessing {split} from {in_path}...")
     df = pd.read_csv(in_path)
     cleaned_df = preprocess_data(df, is_training=(split in ["train", "eval"]))
 
     out_path = out_dir / f"cleaned_{split}.csv"
     cleaned_df.to_csv(out_path, index=False)
-    print(f"✅ Cleaned {split} saved to {out_path} ({cleaned_df.shape})")
+    print(f"Cleaned {split} saved to {out_path} ({cleaned_df.shape})")
     return cleaned_df
 
 

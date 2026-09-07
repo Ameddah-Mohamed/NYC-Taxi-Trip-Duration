@@ -1,10 +1,10 @@
-# 🚕 NYC Taxi Trip Duration — Production MLOps System
+# NYC Taxi Trip Duration — Production MLOps System
 
-An end-to-end, modular, and production-ready Machine Learning system for predicting NYC Yellow Taxi trip durations. Refactored from exploratory Jupyter notebooks into clean pipelines with **Optuna**, **MLflow Model Registry**, **FastAPI**, **Streamlit**, and **Docker**.
+An end-to-end, modular Machine Learning system for predicting NYC Yellow Taxi trip durations. Refactored from exploratory Jupyter notebooks into decoupled pipelines with Optuna, MLflow Model Registry, FastAPI, Streamlit, and Docker.
 
 ---
 
-## 🏛️ System Architecture
+## Architecture
 
 ```
                        Raw Dataset (data/NYC.csv)
@@ -43,17 +43,17 @@ An end-to-end, modular, and production-ready Machine Learning system for predict
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 nyc-trip/
 ├── src/
-│   ├── config.py                 # Centralized Pydantic settings & thresholds
-│   ├── feature_pipeline/         # Data loading, cleaning & feature engineering
+│   ├── config.py                 # Centralized Pydantic settings and thresholds
+│   ├── feature_pipeline/         # Data loading, cleaning, and feature engineering
 │   │   ├── load.py
 │   │   ├── preprocess.py
 │   │   └── feature_engineering.py
-│   ├── training_pipeline/        # Model training & optimization
+│   ├── training_pipeline/        # Model training and optimization
 │   │   ├── train.py              # Baseline training (LightGBM & XGBoost)
 │   │   ├── tune.py               # Optuna Bayesian tuning + MLflow Model Registry
 │   │   └── eval.py               # Holdout evaluation report
@@ -69,13 +69,13 @@ nyc-trip/
 ├── Dockerfile                    # API container image
 ├── Dockerfile.streamlit          # Streamlit dashboard container image
 ├── pytest.ini                    # Pytest configuration
-├── pyproject.toml                # Project metadata & dependencies
+├── pyproject.toml                # Project metadata and dependencies
 └── requirements.txt              # Production dependencies
 ```
 
 ---
 
-## 🚀 Quickstart & Pipeline Execution
+## Quickstart and Pipeline Execution
 
 ### 1. Environment Setup
 ```bash
@@ -96,12 +96,12 @@ python -m src.feature_pipeline.preprocess
 python -m src.feature_pipeline.feature_engineering
 ```
 
-### 3. Model Training & Optuna Tuning
+### 3. Model Training and Optuna Tuning
 ```bash
 # Train baseline model (LightGBM or XGBoost)
 python -m src.training_pipeline.train --model_type lightgbm
 
-# Run Bayesian hyperparameter tuning with Optuna & MLflow
+# Run Bayesian hyperparameter tuning with Optuna and MLflow
 python -m src.training_pipeline.tune --model_type lightgbm --n_trials 10
 
 # Evaluate best model on unseen June holdout data
@@ -112,17 +112,17 @@ python -m src.training_pipeline.eval
 ```bash
 mlflow ui --backend-store-uri sqlite:///mlruns.db
 ```
-Open [http://127.0.0.1:5000](http://127.0.0.1:5000) to inspect trial metrics and the registered `nyc_taxi_trip_duration_model`.
+Open http://127.0.0.1:5000 to inspect trial metrics and the registered nyc_taxi_trip_duration_model.
 
 ---
 
-## 🌐 Serving & Dashboards
+## Serving and Dashboards
 
 ### FastAPI REST Service
 ```bash
 uvicorn src.api.main:app --reload --port 8000
 ```
-Interactive Swagger API documentation: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
+Interactive Swagger API documentation: http://127.0.0.1:8000/docs.
 
 Example Single Trip Prediction:
 ```bash
@@ -142,11 +142,11 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 ```bash
 streamlit run app.py
 ```
-Open [http://localhost:8501](http://localhost:8501) to test trips with landmark presets, view map routes, and inspect holdout metrics.
+Open http://localhost:8501 to test trips with landmark presets, view map routes, and inspect holdout metrics.
 
 ---
 
-## 🧪 Testing Suite
+## Testing Suite
 
 Run the full automated test suite:
 ```bash
@@ -155,13 +155,13 @@ pytest -v
 All 16 tests cover:
 * Coordinate distance formulas and date feature extraction
 * Data leakage prevention and coordinate outlier filtering
-* Skew-free inference smoke tests & scrambled column ordering
+* Skew-free inference smoke tests and scrambled column ordering
 * Pydantic schema validation rejecting invalid GPS coordinates
-* Fast training & holdout evaluation output integrity
+* Fast training and holdout evaluation output integrity
 
 ---
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 Build and run API container:
 ```bash

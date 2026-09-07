@@ -35,7 +35,7 @@ def evaluate_model(
     if not m_path.exists():
         raise FileNotFoundError(f"Model file not found at {m_path}. Train a model first.")
 
-    print(f"📖 Loading holdout data from {h_path}...")
+    print(f"Loading holdout data from {h_path}...")
     df = pd.read_csv(h_path)
     target = "trip_duration"
 
@@ -45,7 +45,7 @@ def evaluate_model(
     X_holdout = df.drop(columns=[target])
     y_holdout = df[target]
 
-    print(f"📦 Loading model from {m_path}...")
+    print(f"Loading model from {m_path}...")
     model = load(m_path)
 
     preds = model.predict(X_holdout)
@@ -69,7 +69,7 @@ def evaluate_model(
         "error_percentage": round(mape_proxy, 2),
     }
 
-    print("🏁 Holdout Evaluation Results:")
+    print("Holdout Evaluation Results:")
     print(f"   Samples Evaluated: {metrics['holdout_samples']}")
     print(f"   RMSE:              {metrics['rmse_seconds']} s")
     print(f"   MAE:               {metrics['mae_seconds']} s")
@@ -80,7 +80,7 @@ def evaluate_model(
     out_json.parent.mkdir(parents=True, exist_ok=True)
     with open(out_json, "w") as f:
         json.dump(metrics, f, indent=2)
-    print(f"💾 Metrics saved to {out_json}")
+    print(f"Metrics saved to {out_json}")
 
     return metrics
 

@@ -96,7 +96,7 @@ def tune_model(
         random_state=random_state,
     )
 
-    print(f"🎯 Starting Optuna study for {model_type.upper()} ({n_trials} trials)...")
+    print(f"Starting Optuna study for {model_type.upper()} ({n_trials} trials)...")
 
     parent_run_name = f"optuna_{model_type}_{n_trials}_trials"
     with mlflow.start_run(run_name=parent_run_name):
@@ -131,11 +131,11 @@ def tune_model(
         study.optimize(objective, n_trials=n_trials)
 
         best_params = study.best_trial.params
-        print(f"🏆 Best {model_type.upper()} Trial #{study.best_trial.number} RMSE: {study.best_value:.2f}s")
+        print(f"Best {model_type.upper()} Trial #{study.best_trial.number} RMSE: {study.best_value:.2f}s")
         print(f"   Best params: {best_params}")
 
         # Retrain best model
-        print(f"🔨 Retraining best {model_type.upper()} model with optimal parameters...")
+        print(f"Retraining best {model_type.upper()} model with optimal parameters...")
         if model_type == "lightgbm":
             final_params = {**best_params, "random_state": random_state, "n_jobs": -1, "verbose": -1}
             best_model = LGBMRegressor(**final_params)
@@ -158,7 +158,7 @@ def tune_model(
         mlflow.log_metrics(best_metrics)
 
         # Log model artifact and register
-        print(f"📦 Registering winning {model_type.upper()} model in MLflow Model Registry ({model_registry_name})...")
+        print(f"Registering winning {model_type.upper()} model in MLflow Model Registry ({model_registry_name})...")
         if model_type == "lightgbm":
             mlflow.lightgbm.log_model(
                 lgb_model=best_model,
@@ -189,12 +189,12 @@ def tune_model(
                 key="model_type",
                 value=model_type,
             )
-            print(f"🏷️ Tagged {model_registry_name} v{current_ver} ({model_type}) as Production")
+            print(f"Tagged {model_registry_name} v{current_ver} ({model_type}) as Production")
 
     # Persist locally to models/best_model.pkl
     dump(best_model, out_path)
-    print(f"💾 Saved best model to {out_path}")
-    print(f"📊 Best Tuned {model_type.upper()} Performance:")
+    print(f"Saved best model to {out_path}")
+    print(f"Best Tuned {model_type.upper()} Performance:")
     print(f"   RMSE: {best_metrics['rmse']:.2f} seconds")
     print(f"   MAE:  {best_metrics['mae']:.2f} seconds")
     print(f"   R²:   {best_metrics['r2']:.4f}")

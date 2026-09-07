@@ -41,7 +41,7 @@ def load_and_split_data(
     out_dir = Path(output_dir) if output_dir is not None else settings.processed_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"📥 Loading raw dataset from: {raw_file}")
+    print(f"Loading raw dataset from: {raw_file}")
     df = pd.read_csv(raw_file)
 
     # Ensure datetime format for time-based split
@@ -52,6 +52,10 @@ def load_and_split_data(
     t_holdout = pd.Timestamp(holdout_cutoff)
 
     # Time-based splitting
+    # Temporal splitting: We split chronologically (Jan-Apr for train, May for eval,
+    # June for holdout) rather than random train_test_split. In real-world transportation
+    # and taxi demand, random splitting causes temporal data leakage because trips on the
+    # same rainy day or holiday would appear in both train and test sets.
     train_df = df[df["pickup_datetime"] < t_eval].copy()
     eval_df = df[(df["pickup_datetime"] >= t_eval) & (df["pickup_datetime"] < t_holdout)].copy()
     holdout_df = df[df["pickup_datetime"] >= t_holdout].copy()
@@ -61,7 +65,7 @@ def load_and_split_data(
     eval_df.to_csv(out_dir / "raw_eval.csv", index=False)
     holdout_df.to_csv(out_dir / "raw_holdout.csv", index=False)
 
-    print(f"✅ Data split completed and saved to {out_dir}:")
+    print(f"Data split completed and saved to {out_dir}:")
     print(f"   Train:   {train_df.shape} (up to {t_eval.date()})")
     print(f"   Eval:    {eval_df.shape} ({t_eval.date()} to {t_holdout.date()})")
     print(f"   Holdout: {holdout_df.shape} (from {t_holdout.date()} onwards)")

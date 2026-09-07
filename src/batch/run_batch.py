@@ -26,7 +26,7 @@ def run_batch_predictions(
     out_dir = Path(output_dir) if output_dir is not None else settings.predictions_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"📦 Starting batch inference from {in_file}...")
+    print(f"Starting batch inference from {in_file}...")
     if sample_limit:
         df = pd.read_csv(in_file, nrows=sample_limit)
         print(f"   Sampled {len(df)} rows for batch run.")
@@ -40,7 +40,7 @@ def run_batch_predictions(
     output_file = out_dir / f"batch_preds_{timestamp}.csv"
     preds_df.to_csv(output_file, index=False)
 
-    print(f"✅ Batch predictions complete! Saved to {output_file}")
+    print(f"Batch predictions complete! Saved to {output_file}")
     print(preds_df[["pickup_datetime", "predicted_duration_seconds", "predicted_duration_minutes"]].head())
 
     return preds_df

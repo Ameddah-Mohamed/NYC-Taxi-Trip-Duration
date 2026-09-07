@@ -115,12 +115,14 @@ def predict(
     feature_names = list(preprocessor.get_feature_names_out())
     df_transformed = pd.DataFrame(X_transformed, columns=feature_names, index=df.index)
 
-    # 6. Strict Schema Alignment (matches training columns exactly)
+    # 6. Strict Schema Alignment:
+    # Production models expect the exact columns in the exact order as training.
+    # Reindexing prevents crashes if categories are missing or unordered in the payload.
     df_aligned = df_transformed.reindex(columns=expected_feature_cols, fill_value=0.0)
 
-    # 7. Generate predictions
+    # 7. Generate predictions and enforce physical duration floor
     raw_preds = model.predict(df_aligned)
-    # Floor predictions at min duration threshold (prevent negative predictions)
+    # Floor predictions at 100 seconds to eliminate impossible negative or near-zero travel times
     predictions_sec = np.maximum(raw_preds, settings.min_trip_duration)
 
     # 8. Assemble result
@@ -149,5 +151,5 @@ if __name__ == "__main__":
     out_file = Path(args.output)
     out_file.parent.mkdir(parents=True, exist_ok=True)
     preds.to_csv(out_file, index=False)
-    print(f"✅ Generated predictions for {len(preds)} trips -> saved to {out_file}")
+    print(f"Generated predictions for {len(preds)} trips -> saved to {out_file}")
     print(preds[["predicted_duration_seconds", "predicted_duration_minutes"]].head())

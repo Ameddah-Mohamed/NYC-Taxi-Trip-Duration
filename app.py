@@ -22,7 +22,7 @@ from src.inference_pipeline.inference import predict
 
 st.set_page_config(
     page_title="NYC Taxi Trip Duration Predictor",
-    page_icon="🚕",
+    page_icon="",
     layout="wide",
 )
 
@@ -38,12 +38,12 @@ NYC_LANDMARKS = {
     "LaGuardia Airport (LGA)": (40.7769, -73.8740),
 }
 
-st.title("🚕 New York City Taxi Trip Duration Predictor")
+st.title("New York City Taxi Trip Duration Predictor")
 st.markdown(
     "Production-grade Machine Learning inference engine for estimating NYC Yellow Taxi travel times."
 )
 
-tab1, tab2, tab3 = st.tabs(["⚡ Live Trip Estimator", "📊 Model Performance & Metrics", "📁 Batch Prediction Explorer"])
+tab1, tab2, tab3 = st.tabs(["Live Trip Estimator", "Model Performance & Metrics", "Batch Prediction Explorer"])
 
 # -------------------------------------------------------------
 # TAB 1: Live Trip Estimator
@@ -52,7 +52,7 @@ with tab1:
     col_left, col_right = st.columns([1, 1])
 
     with col_left:
-        st.subheader("📍 Configure Trip")
+        st.subheader("Configure Trip")
 
         use_presets = st.checkbox("Select from popular NYC Landmarks", value=True)
 
@@ -83,10 +83,10 @@ with tab1:
 
         combined_datetime = f"{trip_date} {trip_time.strftime('%H:%M:%S')}"
 
-        predict_btn = st.button("🚀 Calculate Estimated Trip Duration", use_container_width=True, type="primary")
+        predict_btn = st.button("Calculate Estimated Trip Duration", use_container_width=True, type="primary")
 
     with col_right:
-        st.subheader("🗺️ Trip Route & Prediction")
+        st.subheader("Trip Route & Prediction")
 
         # Compute straight-line distance
         dist_km = haversine_distance(pickup_lon, pickup_lat, dropoff_lon, dropoff_lat)
@@ -117,8 +117,8 @@ with tab1:
 
         # Map plot
         map_df = pd.DataFrame([
-            {"lat": pickup_lat, "lon": pickup_lon, "type": "Pickup 🟢"},
-            {"lat": dropoff_lat, "lon": dropoff_lon, "type": "Dropoff 🔴"},
+            {"lat": pickup_lat, "lon": pickup_lon, "type": "Pickup "},
+            {"lat": dropoff_lat, "lon": dropoff_lon, "type": "Dropoff "},
         ])
         fig = px.scatter_map(
             map_df,
@@ -135,7 +135,7 @@ with tab1:
 # TAB 2: Model Performance & Metrics
 # -------------------------------------------------------------
 with tab2:
-    st.subheader("📈 Production Model Performance Summary")
+    st.subheader("Production Model Performance Summary")
 
     metrics_file = settings.models_dir / "eval_metrics.json"
     if metrics_file.exists():
@@ -156,7 +156,7 @@ with tab2:
 # TAB 3: Batch Prediction Explorer
 # -------------------------------------------------------------
 with tab3:
-    st.subheader("📁 Latest Batch Prediction Outputs")
+    st.subheader("Latest Batch Prediction Outputs")
     pred_files = sorted(settings.predictions_dir.glob("*.csv"))
     if pred_files:
         selected_file = st.selectbox("Select Prediction Artifact", [f.name for f in pred_files])

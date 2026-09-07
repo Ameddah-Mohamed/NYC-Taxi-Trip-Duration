@@ -45,7 +45,7 @@ def load_train_eval_data(
     t_path = Path(train_path) if train_path is not None else settings.processed_dir / "feature_engineered_train.csv"
     e_path = Path(eval_path) if eval_path is not None else settings.processed_dir / "feature_engineered_eval.csv"
 
-    print(f"📖 Loading data: {t_path.name} and {e_path.name}")
+    print(f"Loading data: {t_path.name} and {e_path.name}")
     train_df = pd.read_csv(t_path)
     eval_df = pd.read_csv(e_path)
 
@@ -112,7 +112,7 @@ def train_model(
         default_params.update(custom_params)
         model = XGBRegressor(**default_params)
 
-    print(f"🚀 Training {model_type.upper()} model with params: {default_params}")
+    print(f"Training {model_type.upper()} model with params: {default_params}")
     model.fit(X_train, y_train)
 
     # Evaluate
@@ -122,14 +122,14 @@ def train_model(
     r2 = float(r2_score(y_eval, y_pred))
     metrics = {"rmse": rmse, "mae": mae, "r2": r2}
 
-    print(f"📊 {model_type.upper()} Performance on Eval Set:")
+    print(f"{model_type.upper()} Performance on Eval Set:")
     print(f"   RMSE: {rmse:.2f} seconds")
     print(f"   MAE:  {mae:.2f} seconds")
     print(f"   R²:   {r2:.4f}")
 
     # Persist model
     dump(model, out_path)
-    print(f"💾 Saved {model_type} model to {out_path}")
+    print(f"Saved {model_type} model to {out_path}")
 
     # Log to MLflow
     if log_to_mlflow:
@@ -143,7 +143,7 @@ def train_model(
                 mlflow.lightgbm.log_model(model, artifact_path="model")
             else:
                 mlflow.xgboost.log_model(model, artifact_path="model")
-            print("📈 Logged run to MLflow")
+            print("Logged run to MLflow")
 
     return model, metrics
 
