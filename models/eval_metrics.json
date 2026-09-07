@@ -1,0 +1,9 @@
+{
+  "holdout_samples": 232091,
+  "rmse_seconds": 3210.14,
+  "mae_seconds": 319.92,
+  "median_absolute_error_seconds": 119.88,
+  "r2_score": 0.0368,
+  "mean_actual_duration_seconds": 1016.91,
+  "error_percentage": 31.46
+}
