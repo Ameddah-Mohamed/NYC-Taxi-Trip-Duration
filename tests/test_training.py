@@ -57,11 +57,22 @@ def test_baseline_training_fast_sample(tmp_path, synthetic_fe_data):
 
 
 def test_eval_metrics_output(tmp_path, synthetic_fe_data):
-    _, _, holdout_file = synthetic_fe_data
+    train_file, _, holdout_file = synthetic_fe_data
+    temp_model_path = tmp_path / "temp_eval_model.pkl"
     metrics_path = tmp_path / "test_metrics.json"
+
+    # Train a temporary model on the synthetic train file to guarantee shape match
+    train_model(
+        model_type="lightgbm",
+        train_path=train_file,
+        eval_path=train_file,
+        model_output=temp_model_path,
+        log_to_mlflow=False,
+    )
 
     metrics = evaluate_model(
         holdout_path=holdout_file,
+        model_path=temp_model_path,
         output_metrics_path=metrics_path,
     )
     assert metrics_path.exists()
