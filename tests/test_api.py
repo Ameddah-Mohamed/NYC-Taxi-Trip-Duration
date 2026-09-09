@@ -69,3 +69,19 @@ def test_predict_invalid_vendor_rejected():
     }
     response = client.post("/predict", json=bad_payload)
     assert response.status_code == 422
+
+
+def test_predict_identical_locations_rejected():
+    # Identical pickup and dropoff must be rejected
+    bad_payload = {
+        "pickup_datetime": "2016-05-20 12:00:00",
+        "vendor_id": 1,
+        "pickup_longitude": -73.9772,
+        "pickup_latitude": 40.7663,
+        "dropoff_longitude": -73.9772,
+        "dropoff_latitude": 40.7663,
+    }
+    response = client.post("/predict", json=bad_payload)
+    assert response.status_code == 422
+    assert "distinct" in response.text.lower() or "identical" in response.text.lower()
+

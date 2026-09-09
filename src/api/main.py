@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 import pandas as pd
 from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from src.config import settings
 from src.inference_pipeline.inference import predict
@@ -68,6 +68,18 @@ class TripRequest(BaseModel):
         description="Valid NYC dropoff latitude (40.50 to 41.00)",
         examples=[40.7527],
     )
+
+    @model_validator(mode="after")
+    def check_distinct_locations(self) -> "TripRequest":
+        dist = haversine_distance(
+            self.pickup_longitude,
+            self.pickup_latitude,
+            self.dropoff_longitude,
+            self.dropoff_latitude,
+        )
+        if dist < 0.05:
+            raise ValueError("Pickup and dropoff locations cannot be identical (distance must be at least 50 meters).")
+        return self
 
 
 class TripResponse(BaseModel):

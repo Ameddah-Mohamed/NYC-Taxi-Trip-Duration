@@ -90,30 +90,37 @@ with tab1:
 
         # Compute straight-line distance
         dist_km = haversine_distance(pickup_lon, pickup_lat, dropoff_lon, dropoff_lat)
+        is_same_location = dist_km < 0.05
 
-        if predict_btn or "last_pred" in st.session_state:
-            if predict_btn:
-                payload = {
-                    "vendor_id": int(vendor),
-                    "pickup_datetime": combined_datetime,
-                    "pickup_longitude": float(pickup_lon),
-                    "pickup_latitude": float(pickup_lat),
-                    "dropoff_longitude": float(dropoff_lon),
-                    "dropoff_latitude": float(dropoff_lat),
-                }
-                res = predict(payload)
-                st.session_state["last_pred"] = {
-                    "sec": float(res["predicted_duration_seconds"].iloc[0]),
-                    "min": float(res["predicted_duration_minutes"].iloc[0]),
-                    "dist": float(dist_km),
-                }
+        if is_same_location:
+            # Clear previous prediction from session state if locations are now identical
+            if "last_pred" in st.session_state:
+                del st.session_state["last_pred"]
+            st.warning("Pickup and dropoff locations cannot be identical (distance: 0.00 km). Please select distinct locations to estimate travel time.")
+        else:
+            if predict_btn or "last_pred" in st.session_state:
+                if predict_btn:
+                    payload = {
+                        "vendor_id": int(vendor),
+                        "pickup_datetime": combined_datetime,
+                        "pickup_longitude": float(pickup_lon),
+                        "pickup_latitude": float(pickup_lat),
+                        "dropoff_longitude": float(dropoff_lon),
+                        "dropoff_latitude": float(dropoff_lat),
+                    }
+                    res = predict(payload)
+                    st.session_state["last_pred"] = {
+                        "sec": float(res["predicted_duration_seconds"].iloc[0]),
+                        "min": float(res["predicted_duration_minutes"].iloc[0]),
+                        "dist": float(dist_km),
+                    }
 
-            last = st.session_state["last_pred"]
-            m1, m2, m3 = st.columns(3)
-            m1.metric("Predicted Time", f"{last['min']:.1f} min", f"{last['sec']:.0f} sec")
-            m2.metric("Distance", f"{last['dist']:.2f} km", f"{last['dist'] * 0.621371:.2f} miles")
-            avg_speed = (last["dist"] / (last["sec"] / 3600.0)) if last["sec"] > 0 else 0
-            m3.metric("Est. Speed", f"{avg_speed:.1f} km/h")
+                last = st.session_state["last_pred"]
+                m1, m2, m3 = st.columns(3)
+                m1.metric("Predicted Time", f"{last['min']:.1f} min", f"{last['sec']:.0f} sec")
+                m2.metric("Distance", f"{last['dist']:.2f} km", f"{last['dist'] * 0.621371:.2f} miles")
+                avg_speed = (last["dist"] / (last["sec"] / 3600.0)) if last["sec"] > 0 else 0
+                m3.metric("Est. Speed", f"{avg_speed:.1f} km/h")
 
         # Map plot: dynamically center on the trip midpoint and adjust zoom to distance
         mid_lat = (pickup_lat + dropoff_lat) / 2.0
@@ -125,20 +132,23 @@ with tab1:
             zoom_level = 10.5
         elif dist_km > 5:
             zoom_level = 11.5
-        else:
+        elif dist_km > 0.05:
             zoom_level = 12.8
+        else:
+            zoom_level = 13.5
 
         fig = go.Figure()
 
-        # Connect pickup and dropoff with a route line
-        fig.add_trace(go.Scattermap(
-            lat=[pickup_lat, dropoff_lat],
-            lon=[pickup_lon, dropoff_lon],
-            mode="lines",
-            line=dict(width=3, color="#1f77b4"),
-            name="Trip Path",
-            hoverinfo="none",
-        ))
+        if not is_same_location:
+            # Connect pickup and dropoff with a route line
+            fig.add_trace(go.Scattermap(
+                lat=[pickup_lat, dropoff_lat],
+                lon=[pickup_lon, dropoff_lon],
+                mode="lines",
+                line=dict(width=3, color="#1f77b4"),
+                name="Trip Path",
+                hoverinfo="none",
+            ))
 
         # Pickup marker (Green)
         fig.add_trace(go.Scattermap(
@@ -153,16 +163,17 @@ with tab1:
         ))
 
         # Dropoff marker (Red)
-        fig.add_trace(go.Scattermap(
-            lat=[dropoff_lat],
-            lon=[dropoff_lon],
-            mode="markers+text",
-            marker=dict(size=14, color="#d62728"),
-            name="Dropoff",
-            text=["Dropoff"],
-            textposition="top right",
-            hovertemplate="<b>Dropoff</b><br>Lat: %{lat:.4f}<br>Lon: %{lon:.4f}<extra></extra>",
-        ))
+        if not is_same_location:
+            fig.add_trace(go.Scattermap(
+                lat=[dropoff_lat],
+                lon=[dropoff_lon],
+                mode="markers+text",
+                marker=dict(size=14, color="#d62728"),
+                name="Dropoff",
+                text=["Dropoff"],
+                textposition="top right",
+                hovertemplate="<b>Dropoff</b><br>Lat: %{lat:.4f}<br>Lon: %{lon:.4f}<extra></extra>",
+            ))
 
         fig.update_layout(
             map=dict(
@@ -173,7 +184,16 @@ with tab1:
             margin=dict(l=0, r=0, t=30, b=0),
             height=390,
             showlegend=True,
-            legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.02, bgcolor="rgba(255,255,255,0.8)"),
+            legend=dict(
+                yanchor="top",
+                y=0.98,
+                xanchor="left",
+                x=0.02,
+                bgcolor="rgba(20, 20, 20, 0.75)",
+                font=dict(color="#ffffff", size=11),
+                bordercolor="rgba(255, 255, 255, 0.2)",
+                borderwidth=1,
+            ),
         )
         st.plotly_chart(fig, use_container_width=True)
 
