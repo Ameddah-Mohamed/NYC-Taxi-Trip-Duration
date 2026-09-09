@@ -115,19 +115,65 @@ with tab1:
             avg_speed = (last["dist"] / (last["sec"] / 3600.0)) if last["sec"] > 0 else 0
             m3.metric("Est. Speed", f"{avg_speed:.1f} km/h")
 
-        # Map plot
-        map_df = pd.DataFrame([
-            {"lat": pickup_lat, "lon": pickup_lon, "type": "Pickup"},
-            {"lat": dropoff_lat, "lon": dropoff_lon, "type": "Dropoff"},
-        ])
-        fig = px.scatter_map(
-            map_df,
-            lat="lat",
-            lon="lon",
-            color="type",
-            zoom=12,
-            height=380,
-            title="Pickup & Dropoff Locations",
+        # Map plot: dynamically center on the trip midpoint and adjust zoom to distance
+        mid_lat = (pickup_lat + dropoff_lat) / 2.0
+        mid_lon = (pickup_lon + dropoff_lon) / 2.0
+
+        if dist_km > 25:
+            zoom_level = 9.5
+        elif dist_km > 12:
+            zoom_level = 10.5
+        elif dist_km > 5:
+            zoom_level = 11.5
+        else:
+            zoom_level = 12.8
+
+        fig = go.Figure()
+
+        # Connect pickup and dropoff with a route line
+        fig.add_trace(go.Scattermap(
+            lat=[pickup_lat, dropoff_lat],
+            lon=[pickup_lon, dropoff_lon],
+            mode="lines",
+            line=dict(width=3, color="#1f77b4"),
+            name="Trip Path",
+            hoverinfo="none",
+        ))
+
+        # Pickup marker (Green)
+        fig.add_trace(go.Scattermap(
+            lat=[pickup_lat],
+            lon=[pickup_lon],
+            mode="markers+text",
+            marker=dict(size=14, color="#2ca02c"),
+            name="Pickup",
+            text=["Pickup"],
+            textposition="top right",
+            hovertemplate="<b>Pickup</b><br>Lat: %{lat:.4f}<br>Lon: %{lon:.4f}<extra></extra>",
+        ))
+
+        # Dropoff marker (Red)
+        fig.add_trace(go.Scattermap(
+            lat=[dropoff_lat],
+            lon=[dropoff_lon],
+            mode="markers+text",
+            marker=dict(size=14, color="#d62728"),
+            name="Dropoff",
+            text=["Dropoff"],
+            textposition="top right",
+            hovertemplate="<b>Dropoff</b><br>Lat: %{lat:.4f}<br>Lon: %{lon:.4f}<extra></extra>",
+        ))
+
+        fig.update_layout(
+            map=dict(
+                style="open-street-map",
+                center=dict(lat=mid_lat, lon=mid_lon),
+                zoom=zoom_level,
+            ),
+            margin=dict(l=0, r=0, t=30, b=0),
+            height=390,
+            showlegend=True,
+            legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.02, bgcolor="rgba(255,255,255,0.8)"),
         )
         st.plotly_chart(fig, use_container_width=True)
 
