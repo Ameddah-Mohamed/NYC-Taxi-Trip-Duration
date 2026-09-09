@@ -139,6 +139,9 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 ```
 
 ### Interactive Streamlit Dashboard
+Live Demo: https://nyc-trip-duration-prediction.streamlit.app/
+
+Local execution:
 ```bash
 streamlit run app.py
 ```
