@@ -1,6 +1,12 @@
 # NYC Taxi Trip Duration — Production MLOps System
 
+[![CI/CD Pipeline](https://github.com/Ameddah-Mohamed/NYC-Taxi-Trip-Duration/actions/workflows/ci.yml/badge.svg)](https://github.com/Ameddah-Mohamed/NYC-Taxi-Trip-Duration/actions/workflows/ci.yml)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://nyc-trip-duration-prediction.streamlit.app/)
+
 An end-to-end, modular Machine Learning system for predicting NYC Yellow Taxi trip durations. Refactored from exploratory Jupyter notebooks into decoupled pipelines with Optuna, MLflow Model Registry, FastAPI, Streamlit, and Docker.
+
+* **Live Demo**: https://nyc-trip-duration-prediction.streamlit.app/
+* **API Documentation**: http://127.0.0.1:8000/docs (Local)
 
 ---
 
@@ -165,6 +171,20 @@ All 16 tests cover:
 ---
 
 ## Docker Deployment
+
+### Pull and Run from GitHub Container Registry (GHCR)
+
+The CI/CD pipeline automatically builds and publishes production container images:
+
+```bash
+# Run FastAPI Backend
+docker run -p 8000:8000 ghcr.io/ameddah-mohamed/nyc-taxi-api:latest
+
+# Run Streamlit Dashboard
+docker run -p 8501:8501 ghcr.io/ameddah-mohamed/nyc-taxi-dashboard:latest
+```
+
+### Build and Run Locally
 
 Build and run API container:
 ```bash
