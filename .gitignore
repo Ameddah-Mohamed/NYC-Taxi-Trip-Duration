@@ -8,6 +8,10 @@ data/
 models/*.pkl
 models/*.joblib
 !models/.gitkeep
+!models/best_model.pkl
+!models/preprocessor.pkl
+!models/feature_columns.json
+!models/eval_metrics.json
 
 # MLflow Tracking
 mlruns/

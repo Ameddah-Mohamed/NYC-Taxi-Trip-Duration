@@ -117,8 +117,8 @@ with tab1:
 
         # Map plot
         map_df = pd.DataFrame([
-            {"lat": pickup_lat, "lon": pickup_lon, "type": "Pickup "},
-            {"lat": dropoff_lat, "lon": dropoff_lon, "type": "Dropoff "},
+            {"lat": pickup_lat, "lon": pickup_lon, "type": "Pickup"},
+            {"lat": dropoff_lat, "lon": dropoff_lon, "type": "Dropoff"},
         ])
         fig = px.scatter_map(
             map_df,
