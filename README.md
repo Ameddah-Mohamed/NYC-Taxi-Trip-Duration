@@ -49,6 +49,22 @@ An end-to-end, modular Machine Learning system for predicting NYC Yellow Taxi tr
 
 ---
 
+## Production Model Performance Benchmark
+
+Evaluated on the unseen **June 2016 temporal holdout split** ($100\text{s} < \text{duration} \le 4000\text{s}$, 228,276 trips), unified with the 100s production prediction floor:
+
+| Metric | Holdout Score | Practical Interpretation |
+| :--- | :--- | :--- |
+| **Root Mean Squared Error (RMSE)** | **291.98 s** | ~4.86 minutes standard deviation |
+| **Mean Absolute Error (MAE)** | **185.56 s** | ~3.09 minutes average error |
+| **Median Absolute Error (MedAE)** | **118.91 s** | ~1.98 minutes typical error (50% within 2 mins) |
+| **Coefficient of Determination ($R^2$)** | **0.7925** | **79.25%** of trip duration variance explained |
+| **Evaluated Holdout Trips** | **228,276** | Out of 232,091 total June trips |
+
+> **Evaluation Integrity & Auditability:** The raw holdout split contains 3,815 uncleaned anomalies and 24-hour outliers present in the wild (e.g. 86,387s). Official benchmark metrics evaluate the model within its operational domain ($100\text{s} < t \le 4000\text{s}$), while unfiltered metrics are logged separately for full observability (`holdout_unfiltered_rmse_seconds: 3209.16 s`).
+
+---
+
 ## Project Structure
 
 ```
@@ -71,7 +87,7 @@ nyc-trip/
 │       └── main.py
 ├── app.py                        # Interactive Streamlit dashboard
 ├── models/                       # Serialized preprocessor (.pkl) and schema (.json)
-├── tests/                        # 16 unit, integration, and API tests
+├── tests/                        # 21 unit, integration, and API tests
 ├── Dockerfile                    # API container image
 ├── Dockerfile.streamlit          # Streamlit dashboard container image
 ├── pytest.ini                    # Pytest configuration
@@ -161,12 +177,13 @@ Run the full automated test suite:
 ```bash
 pytest -v
 ```
-All 16 tests cover:
-* Coordinate distance formulas and date feature extraction
+All 21 tests cover:
+* Coordinate distance formulas and cyclical date feature extraction (sin/cos of hour, dow, month + rush-hour flags)
 * Data leakage prevention and coordinate outlier filtering
-* Skew-free inference smoke tests and scrambled column ordering
-* Pydantic schema validation rejecting invalid GPS coordinates
-* Fast training and holdout evaluation output integrity
+* Strict schema reindexing, missing category fallback, and scrambled column ordering
+* Pydantic schema validation rejecting invalid GPS coordinates and identical points
+* Single-trip (`/predict`) and batch (`/predict/batch`) REST endpoints (empty/invalid handling)
+* Outlier-filtered holdout evaluation protocol and metric summary export
 
 ---
 

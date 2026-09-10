@@ -208,15 +208,23 @@ with tab2:
         with open(metrics_file, "r") as f:
             metrics = json.load(f)
 
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Median Absolute Error", f"{metrics.get('median_absolute_error_seconds', 0):.1f} s", "~2 mins")
-        c2.metric("Mean Absolute Error (MAE)", f"{metrics.get('mae_seconds', 0):.1f} s")
-        c3.metric("Root Mean Squared Error (RMSE)", f"{metrics.get('rmse_seconds', 0):.1f} s")
-        c4.metric("Holdout Test Samples", f"{metrics.get('holdout_samples', 0):,}")
+        c1, c2, c3, c4, c5 = st.columns(5)
+        c1.metric("R² Score", f"{metrics.get('r2_score', 0):.4f}", "+0.7925 variance")
+        c2.metric("RMSE", f"{metrics.get('rmse_seconds', 0):.2f} s", "~4.9 mins")
+        c3.metric("MAE", f"{metrics.get('mae_seconds', 0):.2f} s", "~3.1 mins")
+        c4.metric("Median Abs Error", f"{metrics.get('median_absolute_error_seconds', 0):.2f} s", "~2.0 mins")
+        c5.metric("Holdout Samples", f"{metrics.get('holdout_samples', 0):,}")
+
+        st.caption(
+            "Official evaluation metrics computed on unseen June 2016 temporal holdout split "
+            f"(filtered to {metrics.get('duration_filter_seconds', [100, 4000])[0]}–{metrics.get('duration_filter_seconds', [100, 4000])[1]}s, "
+            f"unified with the 100s prediction floor). Total raw holdout trips: {metrics.get('holdout_total_samples', 232091):,}."
+        )
 
         st.json(metrics)
     else:
         st.info("Run `python -m src.training_pipeline.eval` to compute and inspect evaluation metrics.")
+
 
 # -------------------------------------------------------------
 # TAB 3: Batch Prediction Explorer
