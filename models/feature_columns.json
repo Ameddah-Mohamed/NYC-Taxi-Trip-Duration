@@ -3,13 +3,15 @@
   "pickup_latitude",
   "dropoff_longitude",
   "dropoff_latitude",
-  "pickup_hour",
-  "pickup_dayofweek",
   "distance_km",
+  "pickup_hour_sin",
+  "pickup_hour_cos",
+  "pickup_dow_sin",
+  "pickup_dow_cos",
+  "pickup_month_sin",
+  "pickup_month_cos",
+  "is_rush_hour",
+  "is_weekend",
   "vendor_id_1",
-  "vendor_id_2",
-  "pickup_month_1",
-  "pickup_month_2",
-  "pickup_month_3",
-  "pickup_month_4"
+  "vendor_id_2"
 ]

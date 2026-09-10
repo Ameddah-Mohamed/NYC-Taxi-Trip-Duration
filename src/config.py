@@ -44,16 +44,26 @@ class Settings(BaseSettings):
     max_longitude: float = -73.00
 
     # Categorical and numerical columns
-    cat_columns: List[str] = Field(default_factory=lambda: ["vendor_id", "pickup_month"])
+    # NOTE (P2): pickup_month OneHot is dropped — the time-aware split leaves
+    # holdout month 6 unseen (all-zeros encoding). Time is represented with
+    # cyclic sin/cos features + rush-hour/weekend flags instead, which
+    # generalize to unseen months.
+    cat_columns: List[str] = Field(default_factory=lambda: ["vendor_id"])
     num_columns: List[str] = Field(
         default_factory=lambda: [
             "pickup_longitude",
             "pickup_latitude",
             "dropoff_longitude",
             "dropoff_latitude",
-            "pickup_hour",
-            "pickup_dayofweek",
             "distance_km",
+            "pickup_hour_sin",
+            "pickup_hour_cos",
+            "pickup_dow_sin",
+            "pickup_dow_cos",
+            "pickup_month_sin",
+            "pickup_month_cos",
+            "is_rush_hour",
+            "is_weekend",
         ]
     )
 

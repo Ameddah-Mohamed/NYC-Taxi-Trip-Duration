@@ -2,7 +2,9 @@
 Feature Engineering Module for NYC Taxi Trip Duration Pipeline.
 
 - Vectorized distance computation (distance_km via Haversine).
-- Temporal feature extraction (pickup_hour, pickup_dayofweek, pickup_month).
+- Cyclical temporal encoding (sin/cos for hour, day-of-week, month) plus
+  rush-hour and weekend flags. Cyclic encoding generalizes to unseen months
+  (e.g. June holdout) where the old month OneHot produced all-zeros.
 - Fits ColumnTransformer (StandardScaler + OneHotEncoder) strictly on train.
 - Persists preprocessor to models/preprocessor.pkl and schema to models/feature_columns.json.
 - Transforms and exports engineered train, eval, and holdout datasets.
@@ -41,12 +43,28 @@ def haversine_distance(
 
 
 def extract_datetime_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Extract temporal components from pickup_datetime."""
+    """Extract cyclical temporal features from pickup_datetime.
+
+    Raw hour/day/month integers mislead tree splits at wrap-around boundaries
+    (23h vs 0h, Dec vs Jan) and the month OneHot cannot represent unseen
+    months. Sin/cos pairs preserve circularity; flags capture known regimes.
+    """
     if "pickup_datetime" in df.columns:
         dt = pd.to_datetime(df["pickup_datetime"])
-        df["pickup_hour"] = dt.dt.hour
-        df["pickup_dayofweek"] = dt.dt.dayofweek
-        df["pickup_month"] = dt.dt.month
+        hour = dt.dt.hour.astype(float)
+        dow = dt.dt.dayofweek.astype(float)
+        month = dt.dt.month.astype(float)
+
+        df["pickup_hour_sin"] = np.sin(2 * np.pi * hour / 24.0)
+        df["pickup_hour_cos"] = np.cos(2 * np.pi * hour / 24.0)
+        df["pickup_dow_sin"] = np.sin(2 * np.pi * dow / 7.0)
+        df["pickup_dow_cos"] = np.cos(2 * np.pi * dow / 7.0)
+        df["pickup_month_sin"] = np.sin(2 * np.pi * (month - 1) / 12.0)
+        df["pickup_month_cos"] = np.cos(2 * np.pi * (month - 1) / 12.0)
+
+        df["is_rush_hour"] = (((hour >= 7) & (hour <= 9)) | ((hour >= 16) & (hour <= 19))).astype(float)
+        df["is_weekend"] = (dow >= 5).astype(float)
+
         df = df.drop(columns=["pickup_datetime"])
     return df
 

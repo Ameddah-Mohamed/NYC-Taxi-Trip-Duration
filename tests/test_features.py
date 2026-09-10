@@ -20,12 +20,25 @@ def test_extract_datetime_features():
         "pickup_datetime": ["2016-03-15 17:45:00", "2016-06-01 02:10:00"]
     })
     df_feat = extract_datetime_features(df)
-    assert "pickup_hour" in df_feat.columns
-    assert "pickup_dayofweek" in df_feat.columns
-    assert "pickup_month" in df_feat.columns
-    assert df_feat["pickup_hour"].tolist() == [17, 2]
-    assert df_feat["pickup_month"].tolist() == [3, 6]
+    # Cyclical encodings replace raw hour/dow/month integers
+    for col in [
+        "pickup_hour_sin", "pickup_hour_cos",
+        "pickup_dow_sin", "pickup_dow_cos",
+        "pickup_month_sin", "pickup_month_cos",
+        "is_rush_hour", "is_weekend",
+    ]:
+        assert col in df_feat.columns
     assert "pickup_datetime" not in df_feat.columns
+    assert "pickup_hour" not in df_feat.columns
+    assert "pickup_month" not in df_feat.columns
+    # 17:45 is PM rush, 02:10 is not; both dates are weekdays (Tue, Wed)
+    assert df_feat["is_rush_hour"].tolist() == [1.0, 0.0]
+    assert df_feat["is_weekend"].tolist() == [0.0, 0.0]
+    # Cyclic values are on the unit circle
+    assert np.isclose(df_feat["pickup_hour_sin"].iloc[0], np.sin(2 * np.pi * 17 / 24))
+    assert np.isclose(df_feat["pickup_hour_cos"].iloc[1], np.cos(2 * np.pi * 2 / 24))
+    # March (month 3) and June (month 6) map to distinct points, no unseen gap
+    assert not np.isclose(df_feat["pickup_month_sin"].iloc[0], df_feat["pickup_month_sin"].iloc[1])
 
 
 def test_drop_leakage_columns():

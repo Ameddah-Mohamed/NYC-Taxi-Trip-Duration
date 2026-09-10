@@ -6,12 +6,12 @@
     100,
     4000
   ],
-  "rmse_seconds": 298.61,
-  "mae_seconds": 190.2,
-  "median_absolute_error_seconds": 121.46,
-  "r2_score": 0.783,
+  "rmse_seconds": 291.98,
+  "mae_seconds": 185.56,
+  "median_absolute_error_seconds": 118.91,
+  "r2_score": 0.7925,
   "mean_actual_duration_seconds": 875.72,
-  "error_percentage": 21.72,
-  "holdout_unfiltered_rmse_seconds": 3210.35,
-  "holdout_unfiltered_mae_seconds": 323.41
+  "error_percentage": 21.19,
+  "holdout_unfiltered_rmse_seconds": 3209.16,
+  "holdout_unfiltered_mae_seconds": 318.87
 }

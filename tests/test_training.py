@@ -15,9 +15,12 @@ def synthetic_fe_data(tmp_path):
     """Create lightweight synthetic feature-engineered datasets for test isolation."""
     cols = [
         "pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude",
-        "pickup_hour", "pickup_dayofweek", "distance_km",
+        "distance_km",
+        "pickup_hour_sin", "pickup_hour_cos",
+        "pickup_dow_sin", "pickup_dow_cos",
+        "pickup_month_sin", "pickup_month_cos",
+        "is_rush_hour", "is_weekend",
         "vendor_id_1", "vendor_id_2",
-        "pickup_month_1", "pickup_month_2", "pickup_month_3", "pickup_month_4",
         "trip_duration"
     ]
     np.random.seed(42)
@@ -104,15 +107,17 @@ def test_eval_filters_outliers_and_reports_both(tmp_path, synthetic_fe_data):
         "pickup_latitude": [0.0, 0.0, 0.0, 0.0],
         "dropoff_longitude": [0.0, 0.0, 0.0, 0.0],
         "dropoff_latitude": [0.0, 0.0, 0.0, 0.0],
-        "pickup_hour": [0.0, 0.0, 0.0, 0.0],
-        "pickup_dayofweek": [0.0, 0.0, 0.0, 0.0],
         "distance_km": [0.0, 0.0, 0.0, 0.0],
+        "pickup_hour_sin": [0.0, 0.0, 0.0, 0.0],
+        "pickup_hour_cos": [1.0, 1.0, 1.0, 1.0],
+        "pickup_dow_sin": [0.0, 0.0, 0.0, 0.0],
+        "pickup_dow_cos": [1.0, 1.0, 1.0, 1.0],
+        "pickup_month_sin": [0.0, 0.0, 0.0, 0.0],
+        "pickup_month_cos": [1.0, 1.0, 1.0, 1.0],
+        "is_rush_hour": [0.0, 0.0, 0.0, 0.0],
+        "is_weekend": [0.0, 0.0, 0.0, 0.0],
         "vendor_id_1": [1.0, 1.0, 1.0, 1.0],
         "vendor_id_2": [0.0, 0.0, 0.0, 0.0],
-        "pickup_month_1": [1.0, 1.0, 1.0, 1.0],
-        "pickup_month_2": [0.0, 0.0, 0.0, 0.0],
-        "pickup_month_3": [0.0, 0.0, 0.0, 0.0],
-        "pickup_month_4": [0.0, 0.0, 0.0, 0.0],
         "trip_duration": [5.0, 50.0, 80000.0, 86387.0],
     }
     outliers = pd.DataFrame(outlier_data)
