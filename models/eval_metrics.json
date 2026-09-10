@@ -1,9 +1,17 @@
 {
-  "holdout_samples": 232091,
-  "rmse_seconds": 3210.35,
-  "mae_seconds": 323.41,
-  "median_absolute_error_seconds": 123.5,
-  "r2_score": 0.0367,
-  "mean_actual_duration_seconds": 1016.91,
-  "error_percentage": 31.8
+  "holdout_samples": 228276,
+  "holdout_total_samples": 232091,
+  "holdout_excluded_outliers": 3815,
+  "duration_filter_seconds": [
+    100,
+    4000
+  ],
+  "rmse_seconds": 298.61,
+  "mae_seconds": 190.2,
+  "median_absolute_error_seconds": 121.46,
+  "r2_score": 0.783,
+  "mean_actual_duration_seconds": 875.72,
+  "error_percentage": 21.72,
+  "holdout_unfiltered_rmse_seconds": 3210.35,
+  "holdout_unfiltered_mae_seconds": 323.41
 }
