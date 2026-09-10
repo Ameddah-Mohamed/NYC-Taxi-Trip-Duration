@@ -1,0 +1,30 @@
+# Slim Docker build context: Dockerfiles only need src/, models/, configs/ (+app.py).
+# Everything below is build-time waste (data/ alone is ~500MB).
+
+.venv/
+env/
+venv/
+
+data/
+mlruns/
+mlruns.db
+mlflow.db
+catboost_info/
+production-pro/
+
+.git/
+.github/
+.gitignore
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+.ipynb_checkpoints/
+*.ipynb
+
+.DS_Store
+
+models/_backup/

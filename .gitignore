@@ -9,9 +9,12 @@ models/*.pkl
 models/*.joblib
 !models/.gitkeep
 !models/best_model.pkl
+!models/baseline_model.pkl
 !models/preprocessor.pkl
 !models/feature_columns.json
 !models/eval_metrics.json
+# Local rollback copies (tags preserve history instead)
+models/_backup/
 
 # MLflow Tracking
 mlruns/
